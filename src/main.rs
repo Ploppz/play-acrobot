@@ -3,7 +3,7 @@ use ggez::{event, graphics::*, Context, GameResult};
 use ggez::event::Keycode;
 use std::time::{Duration, Instant};
 use rsrl::{
-    domains::{Domain, Observation, Acrobat},
+    domains::{Domain, Observation, Acrobot},
     core::Controller,
 };
 
@@ -24,14 +24,14 @@ fn main() {
 }
 
 struct Game {
-    env: Acrobat,
+    env: Acrobot,
     action: usize,
     last_update: Instant,
 }
 impl Game {
     pub fn new() -> Game {
         Game {
-            env: Acrobat::default(),
+            env: Acrobot::default(),
             action: 1,
             last_update: Instant::now(),
         }
@@ -49,31 +49,7 @@ impl event::EventHandler for Game {
         Ok(())
     }
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        clear(ctx);
-        let state = self.env.emit();
-        let state = state.state();
-        let (theta1, theta2) = (state[0] as f32, state[1] as f32);
-
-        // Then we draw a rectangle with the Fill draw mode, and we convert the
-        // Food's position into a `ggez::Rect` using `.into()` which we can do
-        // since we implemented `From<GridPosition>` for `Rect` earlier.
-        // graphics::rectangle(ctx, color, graphics::DrawMode::fill(), self.pos.into())
-
-        
-        // set_color(ctx, [0.5, 0.5, 0.5, 1.0].into())?;
-        let pos1 = Point2::new(WIDTH*0.5, HEIGHT*0.5);
-        let rect1 = Mesh::new_polygon(ctx, DrawMode::Fill, &rectangle(m(0.1), m(1.0)))?;
-        draw(ctx, &rect1, pos1, theta1)?;
-
-
-        let pos2 = Point2::new(pos1.x - m(1.0)*theta1.sin(), pos1.y + m(1.0)*theta1.cos());
-        let rect2 = Mesh::new_polygon(ctx, DrawMode::Fill, &rectangle(m(0.1), m(1.0)))?;
-        draw(ctx, &rect2, pos2, theta1 + theta2)?;
-
-        present(ctx);
-        // We yield the current thread until the next update
-        ggez::timer::yield_now();
-        // And return success.
+        self.env.render(ctx);
         Ok(())
     }
     fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: event::Mod, _repeat: bool) {
